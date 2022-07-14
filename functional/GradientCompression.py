@@ -59,7 +59,6 @@ class GC():
     def get_filter_grad_similar(self, weight_grad_torch, compress_rate, distance_rate, length, dist_type="mean"):
         codebook = torch.ones(length).cuda()
 
-        # 卷积层
         if len(weight_grad_torch.size()) == 4:
             filter_pruned_num = int(weight_grad_torch.size()[0] * (1 - compress_rate))
             similar_pruned_num = int(weight_grad_torch.size()[0] * distance_rate)
@@ -79,11 +78,11 @@ class GC():
             # distance using numpy function
             indices = torch.LongTensor(filter_large_index).cuda()
             weight_vec_after_norm = torch.index_select(weight_grad_vec, 0,
-                                                       indices).cpu().numpy()  # index_select(input, dim, index) -> input中输入的一个该是一个张量（tensor）,dim代表选取的维度：0代表行，1代表列 ,后面的张量代表的是指定的行或列
+                                                       indices).cpu().numpy()
             # for euclidean distance
             if dist_type == "l2" or "l1":
                 similar_matrix = distance.cdist(weight_vec_after_norm, weight_vec_after_norm,
-                                                'euclidean')  # scipy.spatial.distance.cdist(XA, XB, metric='euclidean', p=None, V=None, VI=None, w=None)，该函数用于计算两个输入集合的距离，通过metric参数指定计算距离的不同方式得到不同的距离度量值
+                                                'euclidean') 
             elif dist_type == "cos":  # for cos similarity
                 similar_matrix = 1 - distance.cdist(weight_vec_after_norm, weight_vec_after_norm, 'cosine')
             similar_sum = np.sum(np.abs(similar_matrix), axis=0)
@@ -103,24 +102,10 @@ class GC():
             similar_pruned_num = int(length * distance_rate)
             weight_grad_vec = weight_grad_torch
 
-            # if dist_type == "l2" or "cos":
-            #     norm = torch.norm(weight_grad_vec, 2, 1)
-            #     norm_np = norm.cpu().numpy()
-            # elif dist_type == "l1":
-            #     norm = torch.norm(weight_grad_vec, 1, 1)
-            #     norm_np = norm.cpu().numpy()
-            # filter_small_index = []
-            # filter_large_index = []
-            # filter_large_index = norm_np.argsort()[filter_pruned_num:]
-            # filter_small_index = norm_np.argsort()[:filter_pruned_num]
-
-            # distance using numpy function
-            # indices = torch.LongTensor(filter_large_index).cuda()
-            # weight_vec_after_norm = torch.index_select(weight_grad_vec, 0,indices).cpu().numpy()  # index_select(input, dim, index) -> input中输入的一个该是一个张量（tensor）,dim代表选取的维度：0代表行，1代表列 ,后面的张量代表的是指定的行或列
             # for euclidean distance
             if dist_type == "l2" or "l1":
                 similar_matrix = torch.cdist(weight_grad_vec, weight_grad_vec,
-                                                p=2)  # scipy.spatial.distance.cdist(XA, XB, metric='euclidean', p=None, V=None, VI=None, w=None)，该函数用于计算两个输入集合的距离，通过metric参数指定计算距离的不同方式得到不同的距离度量值
+                                                p=2)  
                 similar_sum = torch.sum(torch.abs(similar_matrix), dim=0)
                 similar_small_index = torch.argsort(similar_sum)[: similar_pruned_num]
                 codebook[similar_small_index] = 0
@@ -208,11 +193,11 @@ class HGC():
             # distance using numpy function
             indices = torch.LongTensor(filter_large_index).cuda()
             weight_vec_after_norm = torch.index_select(weight_grad_vec, 0,
-                                                       indices).cpu().numpy()  # index_select(input, dim, index) -> input中输入的一个该是一个张量（tensor）,dim代表选取的维度：0代表行，1代表列 ,后面的张量代表的是指定的行或列
+                                                       indices).cpu().numpy() 
             # for euclidean distance
             if dist_type == "l2" or "l1":
                 similar_matrix = distance.cdist(weight_vec_after_norm, weight_vec_after_norm,
-                                                'euclidean')  # scipy.spatial.distance.cdist(XA, XB, metric='euclidean', p=None, V=None, VI=None, w=None)，该函数用于计算两个输入集合的距离，通过metric参数指定计算距离的不同方式得到不同的距离度量值
+                                                'euclidean') 
             elif dist_type == "cos":  # for cos similarity
                 similar_matrix = 1 - distance.cdist(weight_vec_after_norm, weight_vec_after_norm, 'cosine')
             similar_sum = np.sum(np.abs(similar_matrix), axis=0)
@@ -251,11 +236,11 @@ class HGC():
             # distance using numpy function
             indices = torch.LongTensor(filter_large_index).cuda()
             weight_vec_after_norm = torch.index_select(weight_grad_p, 0,
-                                                       indices).cpu().numpy()  # index_select(input, dim, index) -> input中输入的一个该是一个张量（tensor）,dim代表选取的维度：0代表行，1代表列 ,后面的张量代表的是指定的行或列
+                                                       indices).cpu().numpy()  
             # for euclidean distance
             if dist_type == "l2" or "l1":
                 similar_matrix = distance.cdist(weight_vec_after_norm, weight_vec_after_norm,
-                                                'euclidean')  # scipy.spatial.distance.cdist(XA, XB, metric='euclidean', p=None, V=None, VI=None, w=None)，该函数用于计算两个输入集合的距离，通过metric参数指定计算距离的不同方式得到不同的距离度量值
+                                                'euclidean')  
             elif dist_type == "cos":  # for cos similarity
                 similar_matrix = 1 - distance.cdist(weight_vec_after_norm, weight_vec_after_norm, 'cosine')
             similar_sum = np.sum(np.abs(similar_matrix), axis=0)
