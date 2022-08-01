@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 import math
 
 
-# psnr用于衡量重构图像的性能
 def psnr(data_input, reconstruct):
     data_input = (data_input-data_input.min())/(data_input.max()-data_input.min())
     reconstract = (reconstruct-reconstruct.min()) / \
